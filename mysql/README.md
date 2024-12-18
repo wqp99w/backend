@@ -875,14 +875,222 @@
                 LIMIT 5;
             ```
         - CONCAT()
+            - 문자열 결합, 요구사항 중에 여러 칼럼값을 합쳐서 제공되길 원할 수 있음
+            - 단, 1개라도 NULL이 존재한다면! -> NULL이 됨
+
+            ```
+            -- 기본 결합
+            SELECT CONCAT('hello','-','world');
+
+            -- null 이 존재한다면 모두 null
+            SELECT CONCAT('hello',NULL,'world');
+
+            -- 실제 테이블에서 적용
+            -- 형식: 도시명-인구수 결과셋으로 나오는 결과 요청
+            -- 컬럼명 spec 지정
+            SELECT concat(c.`name`,'-', c.Population) AS spec
+            FROM city2 AS c;
+            ```
+
         - LOCATE()
+            - 문자열 내에 특정 문자열의 처음 등장하는 위치를 반환
+            - 시작 위치는 1부터 출발
+            - 0: 없다
+            ```
+                        
+            -- 위치 체크
+            SELECT LOCATE('w','world');
+            -- 앞에는 찾으려는 문자열, 뒤에는 대상 문자열
+            -- w는 맨 앞이니까 1로 나오는 것을 알 수 있음
+
+            SELECT LOCATE('or','world');
+            -- 이건 2
+
+            SELECT LOCATE('z','world');
+            -- 찾을 수 없으면 0으로 나온다
+
+            -- 특정 게시물, 말뭉치(텍스트 덩어리)에서 검색어가 존재하는지 체크
+            -- city 테이블에서
+            -- 도시이름이 se로 시작하는 모든 도시들을 찾아서
+            -- 위치값이 1<=위치값<4 : 1,2,3만 해당
+            -- 해당 데이터들은 모두 오름차순 정렬
+            -- 출력값 도시명, 위치값(loc)
+
+            -- 서브 쿼리 사용 -> 결과셋을 이용하여 요구사항 구현
+            SELECT c.`Name`, LOCATE('se',c.`Name`) AS loc
+            FROM city2 AS c
+            WHERE LOCATE('se',c.`Name`) BETWEEN 1 and 2
+            ORDER BY loc;
+            -- between은 문자 between 조건 and 조건 형식으로 이상 이하를 묶은거
+
+            SELECT c.`Name`, LOCATE('se',c.`Name`) AS loc
+            FROM city2 AS c
+            having loc BETWEEN 1 and 2
+            ORDER BY loc;
+            -- 셀렉트에서 선언한 별명을 변수로 이용하고 싶으면 having을 사용
+            -- where는 셀렉보다 먼저 작동해서 셀렉에서 선언한거 사용 불가능
+            ```
         - LEFT(), RIGHT()
+            - 왼쪽 기준 자르기
+            - 오른쪽 기준 자르기
+            - 데이터의 특정 프만 추출할 때 사용
+            ```
+                -- 왼쪽 기준 3개
+                SELECT LEFT('hello world', 3);
+
+                -- 오른쪽 기준 3개
+                SELECT RIGHT('hello world', 3);
+
+                -- 테이블에 적용
+                -- 문자열, 수치형 -> 모두OK
+                SELECT
+                LEFT(c.`Name`, 2), c.`Name`, RIGHT(c.`Name`, 3), -- 문자열
+                LEFT(c.Population, 2), c.Population, RIGHT(c.Population, 3) -- 수치형
+                FROM city2 AS c;
+            ```
         - LOWER(), UPPER()
+            -- 소문자, 대문자 처리 -> 일괄 변경
+            ```
+                -- 소문자, 대문자 변환
+                -- 오직 알파벳문자만 대상 처리됨
+                SELECT LOWER('abAB12가나!@');
+                SELECT UPPER('abAB12가나!@');
+
+                -- 테이블 컬럼에서 적용
+                SELECT NAME, LOWER(NAME), UPPER(NAME)
+                FROM city;
+            ```
+
         - REPLACE()
+            - 특정 문자열 대체
+            ```
+                -- 원본 데이터 기준 특정 문자열을 다른 문자열로 교체
+                SELECT REPLACE('abAB12가나!@','bAB','-비ab-');
+
+                -- 수치형 적용
+                -- 1780000 => 178****
+                SELECT c.Population, REPLACE(c.Population, '0', '*')
+                FROM city2 AS c
+            ```
         - TRIM()
+            - 공백(노이즈) 제거
+                - 앞, 뒤, 내부
+            - 지정자
+                - BOTH
+                    - 양쪽, 공백 이외의 특정 문자 제거
+                - LEADING
+                    - 앞쪽 공백 이외의 특정 문자 제거
+                - TRAILING
+                    - 뒤쪽 공백 이외의 특정 문자 제거
+            ```
+                -- 공백제거, 특정 문자 제거
+                SELECT TRIM('      ab    cd     ') -- 좌우 공백 제거 ok
+                , TRIM('   ab')
+                , TRIM('ab   ')
+                -- 대상 문자열에서 @제거
+                -- 시작문자, 끝문자 중요 - 연속성 중요
+                , TRIM(LEADING '@' FROM '@@@ A @@@')
+                , TRIM(TRAILING '@' FROM '@@@ A @@@')
+                , TRIM(BOTH '@' FROM '@@@ A @@@')
+                , TRIM(BOTH '@' FROM '[@@@ A @@@]');
+
+                -- 테이블 적용
+                -- 대소문자 구분
+                SELECT c.`Name`, TRIM(LEADING 'S' FROM c.`Name`)
+                FROM city2 AS c
+                WHERE c.CountryCode = 'KOR';
+            ```
         - FORMAT()
+            - 포멧팅, 형식을 갖춰준다!!
+            - 수치형 => n자리마다 , 삽입
+            ```
+                -- 포멧
+                -- format (수치형 데이터, 소수부 자리수 지정)
+                -- 정수부는 무조건 3자리 단위로 , 삽입
+                -- 소수부는 자리수에 맞춰서 남김 -> 반올림 처리
+                SELECT FORMAT(32324342424424243.2455432432432,3), -- xxx.246
+                        FORMAT(32324342424424243.2432432432432,4);
+
+                -- 테이블 적용
+                -- 1780000 => 1,780,000 문자열로 처리해서 표현
+                SELECT c.Population, FORMAT(c.Population,0)
+                FROM city2 AS c
+            ```
         - SUBSTRING()
+            - 타겟 문자열의 특정 위치에서 특정 길이만큼 추출
+            ```
+                -- 문자열 자르기, left: 왼쪽기준, right: 오른쪽기준,
+                -- substring(): 원하는 위치에서 자르기
+                -- 012 가 아니라 123 번째로 위치를 봐야 한다
+                -- 위치 정보는 1부터 출발
+                -- substring(타겟 문자열, 시작 위치, 길이)
+                SELECT SUBSTRING('ABCDEFG', 2, 3);
+
+                -- 포멧팅된 로그 잘라서 추출, 문자열 분할처리 유용
+            ```
     - 수학
+        - 수치형 데이터 => 내림, 올림, 반올림, 버림, 수학계산(제곱근, 자연로그, ...)
+                        => 통계 (표준편차, 분산, 합산, 최소, 최대, 평균)
+                        => 절대값, 난수, ...
+        - floor(), cell(), round()
+        - 내림, 올림, 반올림
+        ```
+            -- 수학 함수
+            -- 부동소수 데이터를 정수로 변환 -> 정보손실 동반함
+            SELECT
+                FLOOR(3.95), -- 내림
+                CEIL(3.95), -- 올림
+                CEIL(3.11), -- 올림
+                ROUND(3.5),	-- 반올림
+                ROUND(3.4);	-- 반올림
+                
+            SELECT
+                CEILING(1.56) -- 올림과 유사, 큰값 쪽으로 지향하는 의미
+        ```
+        - 기타 수학함수
+            - 특수 케이스, 수학적 연산 필요 시 사용
+            ```
+                -- 수학 계산
+                -- 참고
+                -- 데이터가 특정구간에 밀집해 있다면 => 데이터 흐트러 놔야 한다
+                -- LOG()를 이용하여 데이터를 분산시켜서 분석 => 결론 => exp() 원복
+                SELECT
+                    SQRT(4), -- 루트 처리
+                    POW(2,3), -- 2*2*2 => 2의 3제곱근, 거급제곱
+                    EXP(3), -- e^3, e의 3 거듭제곱
+                    LOG( EXP(3) ) ;  -- EXP() <-> 역함수 <-> LOG()
+                    
+                -- 삼각함수
+                -- 거리계산시 사용 !! 데이터가 GPS존재한다면
+                -- 두 지점의 직선거리 계산시 유용
+                SELECT PI(), 
+                    SIN( PI()/2 ),
+                    COS( PI() ),
+                    TAN( PI()/4 );
+                    
+
+                -- 절대값, 난수
+                -- 0.0 <= RAND() <= 1.0
+                SELECT
+                    ABS(-1), -- 절대값 => 양으로 표현!!
+                    ABS(1),
+                    RAND();
+
+                -- 난수 응용, 0<= 난수 <=10 구현하시오 -> 정수!!
+                -- 0.0*10 <= RAND()*10 <= 1.0*10
+                -- 0.0 <= RAND() <= 10.0
+                -- 반올림으로 임의로 정수  처리
+                SELECT ROUND(RAND()*10, 0);
+                -- 임의값에 의해서 이벤트, 추첨 
+                -- => 주의 (확률 세팅) => 프로그램에서 해결
+                -- 간단하게 난수로 값들 조정할때 사용
+
+                -- 표준편차, 분산()
+                -- 데이터가 얼마나 서로 떨어져 있는가?
+                -- 데이터 분포를 파악, 설명하는 용도 => 분석분야
+                SELECT STD(city.Population)
+                FROM city
+            ```
     - 시간
     - 형변환
     - 일반
