@@ -1090,14 +1090,668 @@
                 -- 데이터 분포를 파악, 설명하는 용도 => 분석분야
                 SELECT STD(city.Population)
                 FROM city
+                
+                -- car_product 테이블
+                -- price 컬럼에서 ,를 제거(replace)하여 price_int 라는 컬럼 생성
+                -- 모든컬럼, price_int 이렇게 출력되게 구성
+                SELECT
+                    COUNT( price_int ) AS 주문수,
+                    SUM( price_int ) AS 주문금액합산,
+                    AVG( price_int ) AS 주문금액평균,
+                    STD( price_int ) AS 주문금액표준편차
+                FROM (
+                    SELECT 
+                        *, 
+                        REPLACE( price, ',', '') AS price_int
+                    FROM car_product
+                ) AS A
+                -- ( 48, 6 )
             ```
     - 시간
-    - 형변환
-    - 일반
-    - 랭킹
+        - NOW(), CURDATE(), CURTIME()
+            - 현재 시간, YYYYMMDD HHMMSS
+            ```
+                -- yyyymmdd hhmmss 정보 각각 획득
+                SELECT NOW(), CURDATE(), CURTIME();
 
-- DDL
+                -- 시간값 자를수 있는가?
+                SELECT left(CURDATE(), 4);
+                -- 활용용도 -> 회원(쇼핑몰) -> 가입일, 수정일, 탈퇴일, 구매시간
+                -- 고객 분류 -> 마케팅, 서비스등제공, 고객등급결정 
+                -- 가입월일 계산 : (현재시간 - 가입시간) => 월(주,년)로 환산
 
-- DML
+                -- 세부적인 시간 정보
+                SELECT NOW(),
+                    YEAR(   NOW() ), 
+                    DATE(   NOW() ),
+                    MONTH(  NOW() ),
+                    DAY(    NOW() ),
+                    HOUR(   NOW() ),
+                    MINUTE( NOW() ),
+                    SECOND( NOW() );
+                    
+                -- 기타 정보 -> 월의 이름, 요일의 이름
+                -- 시간 -> 요일 -> 주간 매출 분석 -> 어떤 요일에 ...
+                SELECT NOW(), 
+                    MONTHNAME( NOW() ),
+                    DAYNAME( NOW() );	
 
-- DQL
+                -- 기타 정보, 주간, 월간, 년간 단위 현재 시간의 위치
+                SELECT NOW(),
+                    DAYOFWEEK(  NOW() ),
+                    DAYOFMONTH( NOW() ),
+                    DAYOFYEAR(  NOW() );
+                    
+                -- 포멧 -> 시간의 형식을 자유롭게 구성!!
+                SELECT DATE_FORMAT( NOW(), '%D %y %s %d %m %j' );
+                -- 일 : %D, %d
+                -- 년 : %y
+                -- 초 : %s
+                -- 월 : %m
+                -- DAYOFYEAR : %j
+
+                -- 가장 많이 사용!! -> 시간 차이 계산!!
+                -- 시간차이 => ex) 가입한지 몇일 되었지?
+                -- ex) 2024/12/3 - 대통령 취임일  = 1000
+                -- DATEDIFF( 시간, 상대적으로 과거 ) => 양수로 나온다
+                -- 양으로 표현 => ABS(), 무조건양수
+                SELECT 
+                    -- 만약 시간의 양(일수만 체크하고 싶다면) -> 무조건 양수
+                    ABS(DATEDIFF( NOW(), '2024-12-01')), -- 과거시간
+                    ABS(DATEDIFF( NOW(), '2024-12-20')), -- 미래시간
+                    ABS(DATEDIFF( '2024-12-20' , NOW())); -- 미래시간
+                    
+                -- 시간 기입은 직접 가능 (형식 일치해야함)
+                SELECT ABS(DATEDIFF( '2024-12-01', '2024-12-18'));
+
+            ```
+    - 기타 부가 기능
+        - 형변환
+            - 타입 변경
+                - 디비에는 다양한 유형의 데이터를 담는 그릇(타입)이 존재
+                - 그릇은 크기가 모두 다르다(담을 수 있는 양이 다름)
+            - A 그릇에 담긴 데이터를 B 그릇으로 변경하는 행위
+                - CAST() 함수, CONVERT()
+                    - BINARY(), CHAR(), DATE(), DATETIME(), DECIAML()
+                    - JSON(), NCHAR(), SIGNED(), TIME(), UNSIGNED()
+                    ```
+                        -- 형변환 함수
+                        -- cast() 함수
+                        -- 문자 -> 수치
+                        -- UNSIGNED 부호가 없는 수치 => 양수
+                        SELECT '123', CAST('123' AS UNSIGNED);
+
+                        -- 문자|숫자 -> 날짜
+                        SELECT CAST('20241218' AS DATE); -- 2024-12-18
+                        SELECT CAST(20241218 AS DATE); -- 2024-12-18
+
+                        -- 숫자 -> 문자
+                        SELECT CONVERT(457398348, CHAR);
+                    ```
+                    - 변경이 가능한 데이터만 변경됨!
+        - 일반
+            - 함수, 키워드
+            - raw 데이터에서 데이터를 범위(band)를 지정하여 해당되는 데이터에 특정 컬럼값 부여하는 방식
+                - 고객: 기본 등급, 골드, 실버, VIP, VVIP 등급책정
+                -   CASE
+                    WHEN 조건 THEN '값1'
+                    WHEN 조건 THEN '값1'
+                    WHEN 조건 THEN '값1'
+                    ...
+                    ELSE '값4' END
+                    as 컬럼병(별칭칭)
+                    ```
+                        -- 홍콩 면적을 기준으로 '홍콩보다 작은 면적', '홍콩보다 큰면적(>=)'
+                        -- 대상 country 테이블 대상
+                        -- 새로운 컬럼 sf_band
+                        -- 출력값  code, name, 면적, sf_band 출력
+                        -- 기존 데이터를 기반으로 새로운 컬럼 생성!! 
+                        -- -> case -when ~ then ~ else ~ end
+
+                        -- 홍콩의 국가코드는 HKG
+                        SELECT
+                            co.`Code`, co.`Name`, co.SurfaceArea,
+                            
+                            case
+                            -- when 조건식 then '값1' 
+                            -- when co.SurfaceArea < 홍콩의면적  then '홍콩보다 작은 면적' 
+                            when co.SurfaceArea < (
+                                -- 서브 쿼리를 조건식에 사용 -> 값이 1개 or 값이 n개(ANY,SOME, ALL)
+                                SELECT SurfaceArea FROM country WHERE CODE='HKG'
+                            )  then '홍콩보다 작은 면적' 
+                            ELSE '홍콩보다 큰면적' END
+                            AS sf_band
+                            
+                        FROM country AS co;
+
+                        -- case when => 컬럼추가(파생변수) 
+                        -- =>집계(group by) => 통계 => 시각화(대시보드)
+                        SELECT
+                            co.`Code`, co.`Name`, co.SurfaceArea,
+                            case
+                            when co.SurfaceArea < (
+                                SELECT SurfaceArea FROM country WHERE CODE='HKG'
+                            )  then '홍콩보다 작은 면적' 
+                            ELSE '홍콩보다 큰면적' END
+                            AS sf_band
+                        FROM country AS co;
+
+                        -- car_member 테이블 대상
+                        -- age_band라는 컬럼 동적 추가
+                        -- 해당 컬럼은 age 컬럼보고 판단
+                        -- 20대미만(<20), 20대(20~29), 30대, 40대, 50대, 60대이상(60~)
+                        -- 출력, car_member 모든 컬럼 + age_band 로 출력
+                        -- 실습 5분 - 고객 데이터를 기반으로 연령대별로 분류(군집(그룹)해라)
+                        SELECT *,
+                            case
+                            when cm.age < 20 then '20대미만' 
+                            when cm.age BETWEEN 20 AND 29 then '20대' 
+                            when cm.age BETWEEN 30 AND 39 then '30대' 
+                            when cm.age BETWEEN 40 AND 49 then '40대' 
+                            when cm.age BETWEEN 50 AND 59 then '50대'
+                            ELSE '60대이상' END
+                            AS age_band
+                        FROM car_member AS cm;
+
+                    ```
+            - like 키워드 - 검색
+                - WHERE에서 사용, 검색 시 사용
+                - 특정 단어가 들어가 있는 모든 데이터를 가져오시오! => LIKE
+                - where | having 컬럼명 like '%검색어' | '검색어%' | '%검색어%'
+                -- '_pp%' => _는 자리수 표현
+                    - 첫번째 글자는 아무문자든 존재, 두/세번째가 pp가 되는 문자열 찾아라
+                ```
+                    SELECT *
+                    FROM (
+                            SELECT *,
+                                case
+                                when co.age<20 then '20대 미만'
+                                when co.age<30 then '20대'
+                                when co.age<40 then '30대'
+                                when co.age<50 then '40대'
+                                when co.age<60 then '50대'
+                                ELSE '60대 이상' end
+                                AS age_band
+                            FROM car_member AS co) AS A
+                    -- WHERE A.age_band LIKE '20대%'; -- 20대로 시작하는 문자열
+                    -- WHERE A.age_band LIKE '%이상'; -- 이상으로 끝나는 문자열
+                    WHERE A.age_band LIKE '%이%'; -- 이 가 들어가있는 문자열
+                ```
+
+        - 랭킹
+            - 랭킹 표현
+            ```
+            -- 랭킹
+            -- 자동차 주문 날짜 <- 오름차순 정렬 후
+            SELECT co.mem_no, co.order_date
+                ,ROW_NUMBER()	OVER (ORDER BY co.order_date ASC) AS RANK1 -- 공동이 없음
+                ,RANK()			OVER (ORDER BY co.order_date ASC) AS RANK2 -- 공동이 있으면 다음 등수는 밀림
+                ,DENSE_RANK()	OVER (ORDER BY co.order_date ASC) AS RANK3 -- 공동 9등이어도 10등이 옴
+            FROM car_order AS co
+
+            ```
+
+# DDL
+    - Data Definition Language
+    - 데이터 정의어
+    - SQL
+        - create    : 테이블 생성
+        - alter     : 테이블 수정
+        - index     : 테이블 색인(인덱스) 작성 -> 검색
+        - drop      : 테이블/인덱스 삭제
+        - view      : 가상 테이블 => 데이터 마트
+    - 특징
+        - 실행 즉시 반영됨
+    
+    - create table as select
+        - 특정 테이블을 조회하여, 결과셋을 기반으로 동일한 테이블 생성
+        ```
+            -- DDL
+            -- create table as select
+            -- city 테이블과 동일한 구조와 데이터를 가진 테이블
+            -- city_copy 만드시오
+            CREATE TABLE city_copy
+            AS SELECT * FROM city2;
+
+            -- 카피된 테이블 확인
+            SELECT COUNT(*) FROM city_copy;
+
+            -- city_sub 테이블 생성
+            -- city 테이블 기반
+            -- 국가코드 한국, 미국, 일본만 대상
+            CREATE TABLE city_sub
+            AS (
+                SELECT c.`Name`, c.CountryCode, c.Population
+                FROM city2 AS c
+                WHERE c.CountryCode IN ('KOR', 'USA', 'JPN'))
+
+
+            SELECT *
+            FROM city_sub
+        ```
+
+    - create database
+        - 새로운 데이터베이스 생성
+            - create database 데이터베이스명
+        - 데이터베이스 삭제
+            - drop database 데이터베이스명
+        ```
+            -- 데이터베이스
+            -- 인코딩 utf8mb4_general_ci <= 한글 정상적 처리
+            CREATE DATABASE A1;
+
+            SHOW DATABASES;
+
+            DROP DATABASE A1;
+        ```
+        - 요구사항 분석 -> ERD + 모델링(생략가능능)
+        - 데이터베이스 생성 -> 테이블생성 -> 더미데이터 추가 -> 프로젝트 시작
+        - SQL 준비
+
+    - create table
+        - 테이블 생성
+        - GUI 진행
+        ```
+            -- 테이블 생성 코드 - GUI
+            CREATE TABLE `guiusers` (
+                `id` INT NOT NULL AUTO_INCREMENT COMMENT '회원고유번호',
+                `uid` VARCHAR(32) NOT NULL COMMENT '회원고유아이디' COLLATE 'utf8mb4_general_ci',
+                `upw` VARCHAR(256) NOT NULL COMMENT '비밀번호-암호화' COLLATE 'utf8mb4_general_ci',
+                `age` TINYINT NULL DEFAULT NULL COMMENT '나이',
+                `email` VARCHAR(128) NULL DEFAULT NULL COMMENT '이메일' COLLATE 'utf8mb4_general_ci',
+                `regdate` TIMESTAMP NOT NULL DEFAULT (now()) COMMENT '가입일',
+                
+                
+                PRIMARY KEY (`id`) USING BTREE,
+                UNIQUE INDEX `uid_upw` (`uid`, `upw`) USING BTREE
+            )
+            COMMENT='회원 테이블'
+            COLLATE='utf8mb4_general_ci'
+            ENGINE=InnoDB
+            ;
+
+
+
+            -- 테이블 생성
+            -- 직접 작성 or  자바코드에서 자동 생성(SQL 몰라도 가능함)
+            -- 간단한 회원테이블
+            CREATE TABLE users (
+                id INT NOT NULL PRIMARY KEY,
+                uid VARCHAR(32) NOT NULL,
+                upw VARCHAR(256) NOT NULL,
+                age INT 	NULL,
+                email VARCHAR(32) NULL,
+                regdate TIMESTAMP NOT null
+            );
+            SHOW TABLES;
+
+            DESC users;
+        ```
+        - PK, FK 관계
+            - 게시글 : 댓글 = 1:N
+                - 댓글 -> 게시글 참조
+                - 게시글 삭제 -> 댓글 모두 삭제 : 통상적 관리
+            - 스프링부트에서 게시판 작성 체크!!
+                - 문법, 관계 설정정
+            - country(국가), city(도시)
+                - 국가가 존재해야 city 존재함
+                - 국가가 사라지면 city 사라짐
+                - country : city = 1 : N <= 참조키로 연동
+    - alter table add | modify | drop
+        - 기존 테이블 추가|수정|삭제 !!
+        - 데이터가 없다면 삭제 후 새로 생성!!
+        - 데이터가 많이 존재하면 alter 추천
+        ```
+          -- alter table
+            DESC users;
+
+            -- 컬럼 추가
+            ALTER TABLE users
+            ADD col INT NULL; 
+
+            DESC users;
+
+            -- 컬럼 수정
+            -- 유투브 -> 조회수 최대 5억뷰 -> 강남스타일 -> 오류발생 -> 타입 확장
+            -- 이미 데이터가 대량으로 존재함 -> 타입을 수정하는등 수정 조치!!
+            ALTER TABLE users
+            MODIFY col VARCHAR(128); -- 타입 변경 처리
+
+            DESC users;
+
+            -- 컬럼 삭제
+            -- 필요없는 컬럼 발생
+            ALTER TABLE users
+            DROP col;
+
+            DESC users;
+        ```
+    - index
+        - 목적
+            - 빠른 검색!!
+            - 다양한 알고리즘 적용
+                - BTREE
+                - ...
+        - 장점
+            - 검색 능력 향상
+            - 정렬, 그룹화 성능 향샹
+            - 고유한 제약 조건 간소화
+        - 단점
+            - 저장공간 소모, 캐싱등 메타 정보 저장
+            - 데이터 갱신되면
+                -> 인덱스 모두 업데이트(필요한만큼)
+                -> 성능 저하를 가져올 수 있다
+                    - 테이블 별로 업데이트가 빈번한지, 고정인지(변동없음) 체크
+            - 관리 복잡하다!!
+        - 종류
+            - B-tree
+                - 범위 쿼리, 정렬 데이터에 효과적인 방식
+                - 주문 날짜, 사용자 아이디
+            - hash
+                - 정확히 일치된 내용을 찾을 때 효과적적
+            - full text
+                - 텍스트 검색에 효과적
+                - 문서 내 키워드 검색
+            - r-tree
+                - GIS, 공간 데이터 검색
+            - ...
+
+    - (*)view
+        - DQL -> 결과를 보관 -> 가상 테이블로 관리 -> 빠른 처리가 가능함
+            - 데이터 마트!!
+        - 특징 
+            - 데이터베이스에 존재하는 가상 테이블
+            - 실제 테이블처럼 행, 열 가지고 있지만 (구조만 존재), 데이터는 x
+            - 데이터는 실제 테이블이 가지고 있음
+            - 역할
+                - 주로 조회용
+                    - 특정 내용 -> 매번 조인 등 복잡한 쿼리로 결과를 획득
+                    - 반복적인 내용 (변하지 않는) -> 유용(1회만 구축)
+                    - 인덱스 x
+                    - 자주 사용하는 쿼리문 결과 => view 구성 => 빠르게 사용가능
+        - create view 뷰이름 as 데이터셋
+            ```
+                -- view 
+                -- 뷰 생성
+                -- city 테이블에서 한국 데이터만 가져와서 가상테이블 view로 생성
+                -- 왜? 가정 한국 도시 데이터를 주로 자주 사용하더라!!
+                -- 한국 도시 데이터를 가상 테이블로 생성 => 직접 사용
+                CREATE VIEW city_view
+                AS
+                SELECT city.`Name`, city.Population
+                FROM city
+                WHERE city.CountryCode='KOR';
+
+                -- city 테이블에서 한국 데이터만 가져와서 => view 사용
+                -- SQL 단계가 축소됨
+                SELECT *
+                FROM city_view;
+
+                -- city, country, countryLanguage 조인
+                -- test_all_data.sql 에는 ERD 파일이 없음
+                -- ERD 확인 -> 관계성 확인!!
+                -- city <-> country <-> countryLanguage
+                -- 조인 : 
+                -- ERD 확인 : PK, FK 확인하여 조인 => ON ~ 
+                -- ERD 부재시 : (동일한 컬럼|동일한 값) 이 존재하는가?
+                -- 오직 한국에 대한 정보만 뷰로 생성
+                -- where 국가코드='KOR'
+                -- 컬럼 : 도시명, 면적, 인구수, 랭귀지
+                -- select ~ 
+                -- 뷰의 이름은 total_kor_view
+                CREATE VIEW total_kor_view
+                AS
+                SELECT A.`Name`, B.SurfaceArea, A.Population, C.`Language`
+                FROM city AS A
+                JOIN country AS B ON A.CountryCode = B.`Code`
+                JOIN countrylanguage AS C ON A.CountryCode = C.CountryCode
+                WHERE A.CountryCode = 'KOR';
+
+                SELECT COUNT(*) FROM total_kor_view;
+
+                -- alter view
+                -- view 수정
+                -- city_view : 도시명, 인구수 : 교체전
+                -- city_view : 국가코드, 인구수 : 교체후
+                ALTER VIEW city_view
+                AS SELECT countrycode, population FROM city;
+
+                SELECT * FROM city_view;
+
+                -- drop view
+                -- view 삭제 -> 가상 테이블 삭제
+                -- 원본 테이블 데이터 보전됨
+                DROP VIEW city_view;
+            ```
+        - alter view
+        - drop view
+# DML
+    - Data Mainpulation Language
+        - 데이터 조작어
+        - SQL
+            - 번외
+                - (*)SELECT, CREATE, (*)INSERT, (*)UPDATE, (*)DELETE : 가장 많이 사용용
+                - CRUD <- 스프링부트 (백엔드 서버 구성 시)에서 디비 연동에 대한 기본 작업
+                    - CREATE
+                    - READ
+                    - UPDATE
+                    - DELETE
+            - INSERT    : 데이터 추가
+            - UPDATE    : 데이터 수정
+                - 필수적으로 조건 부여 중요!! -> 누락되면 사고 위험이 있음 (관리개념, 개발 시)
+            - DELETE    : 데이터 삭제
+                - 필수적으로 조건 부여!!
+                - 커밋이라는 단계를 거치지 않았다면, 롤백 가능함!!
+            - TRUNCATE
+                - 테이블의 데이터를 한번에 삭제 -> 최초 형태로 유지
+                - 복구 불가
+            - DROP
+                - 테이블 삭제
+        - INSERT
+            - 데이터를 테이블에 입력
+            ```
+                -- 데이터 직접 입력
+                -- users 테이블 대상
+                INSERT INTO users
+                -- 대상 컬럼 나열
+                -- 생략 가능 : 1. 자동 삽입( ex)id )되는 컬럼 2. null 허용 컬럼
+                ( uid, upw, age, email, regdate) 
+                VALUES ( 'guest', '1234', '25', 'a@a.com', NOW());
+
+                SELECT * FROM users;
+
+                -- 중볷된 데이터가 존재 -> KEY 오류 발생
+                -- 이미 가입된 아이디가 잇다? 아이디가 중복된다!!
+                -- (*)가장 기본적 형태를 가장 많이 사용한다!!
+                INSERT INTO users
+                ( uid, upw, age, email, regdate) 
+                VALUES ( 'guest', '1234', '25', 'a@a.com', NOW());
+
+                -- uid에 대한 unique 처리가 않되 있어서 통과된다!! => 테이블 수정
+                -- uid unique 인텍스 처리 필요!! => 오전학습 정리때 시도
+                INSERT INTO users
+                ( uid, upw, age, email, regdate) 
+                VALUES ( 'guest', '12345', '25', 'a@a.com', NOW());
+
+                -- 컬럼 파트는 생략 가능함 , 통째로 -> 데이터는 순서대로 배치해야함
+                -- 가급적 풀버전으로 sql 구성 => 관리상 유리
+                INSERT INTO users
+                VALUES ( 4, 'guest1', '12345', '35', 'b@b.com', NOW());
+
+                -- 멀티 데이터 밀어 넣기
+                -- 1개 이상 데이터 넣기
+                -- 데이터 파트를 , 구분하여 나열
+                INSERT INTO users
+                ( uid, upw, age, email, regdate) 
+                VALUES 
+                    ( 'guest5', '123450', '35', 'a1@a.com', NOW()),
+                    ( 'guest6', '123451', '45', 'a2@a.com', NOW()),
+                    ( 'guest7', '123452', '55', 'a3@a.com', NOW()) ;		
+
+
+                SELECT * FROM users;
+
+                -- 구조가 동일한 테이블이 있다면
+                -- 오전 학습 정리시 users 테이블과 동일한 구조의 users_copy 생성후
+                -- 아래 쿼리 실행!!
+                INSERT INTO users_copy SELECT * FROM users;
+            ```
+        - UPDATE
+            - 기존 내용(데이터) 업데이트
+            - 조건을 사용!(사고 에방)
+            - 작성한 글/외훤 정보/... 수정하기!! <= 예시
+            ```
+                -- 회원 정보 수정
+                UPDATE users
+                SET email='c@c.com', age=age+5; -- 전제 수정
+
+                -- 5번 회원의 정보를 수정!!!
+                UPDATE users
+                SET email='d@d.com', age=age+5
+                WHERE id=5; -- 특정 대상만 수정
+
+                SELECT * FROM users;
+            ```
+        - Delete
+            - 행(데이터) 삭제
+            - 조건식 사용
+            - 복구 가능함
+            ```
+                -- 회원 탈퇴,..
+                DELETE FROM users
+                WHERE id=4;
+
+                -- 글-댓글, country-city
+                -- 기본키, 참조키 연관
+                -- 1:N(일대 다 개념)
+                -- 1개 국가에는 여러개의 도시가 존재한다, 부모대 자식 관계
+
+                -- 더미 테이블 - 국가
+                CREATE TABLE country2 (
+                    country_id INTEGER,
+                    NAME VARCHAR(64),
+                    population INTEGER,
+                    PRIMARY KEY (country_id)
+                );
+                -- 더미 데이터 추가
+                INSERT INTO country2
+                VALUES (1, '서울', 10000000),(2,'부산', 5000000); -- 멀티 데이터 입력
+
+                -- FK : FOREIGN KEY (외래키, 참조키)
+
+                FOREIGN KEY (컬럼)
+                REFERENCES 테이블명 (참조할컬럼명)
+                [ON DELETE CASCADE ] -- [] 생략가능,  
+                -- CASCADE : 국가데이터삭제->참조하는 모든 도시도 삭제
+
+                -- 더미 테이블 - 도시
+                CREATE TABLE city2 (
+                    city_id INTEGER,
+                    NAME VARCHAR(64),	
+                    country_id INTEGER,  -- country2 를 참조!! -> FK
+                    
+                    PRIMARY KEY (city_id),
+                    FOREIGN KEY (country_id) -- city2.country_id 임
+                    REFERENCES country2 (country_id)
+                    ON DELETE CASCADE -- 참조하는 데이터가 삭제되면 같이 모두 삭제된다!!
+                );
+
+                -- 도시(자치구) 더미 데이터 
+                INSERT INTO city2
+                VALUES 
+                    (1, '성북구', 1), -- (고유번호, 자치구명, 서울고유값(1))
+                    (2, '강남구', 1),
+                    (3, '부산진구', 2); -- (고유번호, 자치구명, 부산고유값(2))
+
+                SELECT * FROM country2;
+                SELECT * FROM city2;
+
+                -- 삭제 처리
+                -- 서울 삭제 -> 서울을 참조하고 있는 모든 자치구도 삭제
+                DELETE FROM country2 WHERE country_id=1;
+
+                -- 서울내 자치구는 모두 삭제되었고, 부산만 남았음
+                SELECT * FROM city2; 
+            ```
+        - TRUNCATE
+            - 복구 불가, 모든 데이터/인덱스 삭제 -> 최초 테이블 상태로 구성
+            - DB 용량 줄어듬
+            ```
+                -- 완전삭제
+                TRUNCATE TABLE city2;
+            ```
+        - DROP
+            - 테이블 삭제, 데이터, 사용공간 모두 삭제
+            ```
+                -- 테이블 삭제
+                DROP TABLE city2;
+                DROP TABLE country2;
+                -- 데이터베이스 삭제
+                DROP DATABASES 디비명;
+            ```
+# DCL
+    - 데이터 제어어, 접근 관리
+        - 보안
+        - 계정생성/삭제 와 권한 부여/제거
+    - SQL
+        - 계정
+            - create user
+            - drop user
+        - 권한
+            - grant
+            - revoke
+        - 관련 데이터베이스
+            - mysql 데이터베이스가 담당 (기본적으로 설치된 DB)
+            ```
+                -- 실습1 = 계정 만들고 삭제하기
+                -- 1. 계정 생성 : 아이디만 부여
+                CREATE user guest1;
+
+                -- 2. 계정 확인
+                SELECT HOST, user, authentication_string FROM user;
+
+                -- 3. 계정 삭제
+                DROP user guest1;
+
+                -- 4. 계정 확인
+                SELECT HOST, user, authentication_string FROM user;
+
+                -- 실습2 - 아이디, 비번, host(접속위치) 넣어서 생성
+                -- 5. localhost 라는 것은 디비가 물리적으로 설치된  PC에서 접속하겠다!!
+                CREATE user guest1@localhost IDENTIFIED BY '1234';
+
+                -- 6. 계정 확인
+                SELECT HOST, user, authentication_string FROM user;
+
+                -- 7. 계정 삭제
+                DROP user guest1@localhost;
+
+                -- 실습3 - 아이디, 비번, host(접속위치):모든 곳에서 접근가능하게!!
+                -- 8. 원격 접속가능하게!! -> % <- 보안에 좋지 않음, 전세계 접근 가능함
+                CREATE user guest1@'%' IDENTIFIED BY '1234';
+
+                -- 9. 계정 확인
+                SELECT HOST, user, authentication_string FROM user;
+
+                -- 10. 세션 관리자에서 접근해봄
+                -- xxxx_sh... 디비만 보임, 접속은된다!!, 업무  x => 권한 부여 필요
+
+                -- 실습 4- 권한부여
+                GRANT [권한] ON [db].[테이블] TO [유저아이디]@[호스트]
+                -- 11. t1 디비에 모든 권한 부여!!
+                GRANT ALL PRIVILEGES ON t1.* TO 'guest1'@'%';
+
+                -- 12. 메모리 저장
+                FLUSH PRIVILEGES;
+
+                -- 13. 세션관리자 확인
+                -- guest1 / 1234 => t1 확인됨
+
+                -- 14. 권한 확인
+                SHOW GRANTS FOR guest1;
+
+                -- 15. 권한 삭제
+                -- 루트 권한에서만 승인됨 (작업)
+                REVOKE ALLmysql PRIVILEGES ON t1.* FROM 'guest1'@'%';
+            ```
+
