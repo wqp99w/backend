@@ -24,15 +24,34 @@ repositories {
 }
 
 dependencies {
+	// 외부 라이브러리 모음
+	// jpa는 자바에서 데이터베이스 연동하는데 객체지향으로 사용하는 ORM 방식을 손쉽게 지원
+	// DB 제품이 변경되었어도, SQL 수정 x
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	// tymeleaf는 템프릿 엔진, SSR 담당
+	// html + 데이터 => 동적으로 html 생성(커스텀)하여 => 응답처리의 재료 구성 : 랜더링
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	// web : 스프링부트 웹서비스 구성의 메인 라이브러리
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	// lombok : getter/setter, 생성자, 빌더(객체 생성 도구)등을 자동으로 생성, 데브툴(생산성 향상)
 	compileOnly 'org.projectlombok:lombok'
+	// devtools : 소스 수정 -> 감시 -> 서버 재가동 자동처리(생산성 향상)
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	// h2 경량 DB, 별도 설치 필요없음 -> 나중에 RDB로 대체 처리 -> JPA 사용시 자동으로 SQL 대응해줌
 	runtimeOnly 'com.h2database:h2'
+	// 롬복
 	annotationProcessor 'org.projectlombok:lombok'
+	// 단위 테스트
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
+	// 써드파트 라이브러리 추가 (수동)
+	// https://mvnrepository.com/ -> 검색 -> 버전체크 -> grale(short) -> 카피 -> 붙여넣기
+	// https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+	// implementation 'com.mysql:mysql-connector-j:9.1.0'
+
+	// build.gradle 변화 -> 설치 (우측 바에 코끼리 아이콘 클릭 -> Gradle 밑에 바에 새로고침 버튼 클릭 -> 사용
 }
 
 tasks.named('test') {
