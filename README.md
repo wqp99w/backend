@@ -193,7 +193,7 @@
     - 구성
         - ~/controllers/ApiController 생성
 
-# 스프링부트 기반 데이터베이스 연동
+# 스프링부트 기반 데이터베이스 연동 -> 게시판 구성
     - java의 DB 연동
         - JDBC -> 컨넥션풀 (기법) -> iBatis -> myBatis -> JPA
     - (*)JPA
@@ -217,3 +217,112 @@
                 runtimeOnly 'com.h2database:h2'
             ```
         - application.properities 환경설정
+            ```
+                spring.application.name=demoex
+                # 1. H2 database 설정
+                # 브라우저에서 접속하여 sql 실행
+                spring.h2.console.enabled=true
+                # 브라우저 접속 주소
+                spring.h2.console.path=/h2-console
+
+                # 2. database connect 파트
+                # app_db는 커스텀이름
+                # C:\Users\사용자명\app_db.mv.db 자동생성(생성 안되면 수동처리)
+                spring.datasource.url=jdbc:h2:~/app_db
+                # 접속 시 드라이버 설정
+                # spring.datasource.driverClassName=org.h2.Driver 이렇게 해도 됨
+                spring.datasource.driver-class-name=org.h2.Driver
+                # 접속계정
+                spring.datasource.username=sa
+                spring.datasource.password=
+
+                # 3. JPA 설정
+                # 데이터베이스 엔진 종류 설정
+                spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
+                # JPA -> 사용이득 -> 테이블로 알아서 생성해준다!!
+                # 엔티티 클래스 작성 -> 매칭되는 테이블이 자동 생성됨!!
+                # 단 데이터베이스는 직접 생성!!
+                spring.jpa.hibernate.ddl-auto=update
+            ```
+    - 디비 접속
+        - 서버 가동 중이어야 함
+        - http://localhost:8080/h2-console
+
+# JPA를 이용한 데이터베이스 프로그램
+    - 코드 관점
+        - workflow
+            - controller <-> service <-> dto <-> repository <-> entity <-> jpa <-> database
+            - 일부 가감될 수는 있다
+
+        - controller
+            - 클라이언트 요청을 처리하는 진입점, 클라이언트는 여기까지만 올 수 있음
+            - 라우트 처리의 결과물
+            - http 요청을 받아서 적절한 서비스 계층으로 호출, 결과를 받아서 반환(응답) 담당
+            - 요약
+                - 요청 처리, 파라미터 검증/추출, 적절한 서비스 호출, 응답 생성/반환
+
+        - service
+            - (*)비즈니스 로직 처리 계층
+            - ex) 검색, 로그인, 로그아웃, 회원가입, 글등록, 글수정, ...
+            - 필요 시 여러 API, 라이브러리 동원하여 처리
+            - 요약
+                - 컨트롤러의 요청을 받아서 처리, 결과를 반환
+                - 데이터는 DTO대상으로 처리
+
+        - dto (Data Transfer Object)
+            - (*)엔티티와 데이터 교환 역할
+            - 왜?, 엔티티는 디비의 테이블에 1개의 데이터와 각각 연결되어 있음
+                - 엔티티가 수정되면, 디비상 테이블의 데이터도 수정된다!! (동기화되어 있음)
+                - 보안에 취약함 (엔티티, 엔티티가 털리면 디비도 털리는거니까)
+                - 엔티티는 절대로 컨트롤러에 노출되면 안됨
+            - 엔티티 -> dto를 통해서 데이터만 전달, 연결 고리가 끊김 -> 보안 처리할 수 있음
+            - 보안때문에 사용
+            - 종류
+                - db
+                    - 엔티티와 데이터 교환용
+                - rest api
+                    - 요청 데이터 대체용(JSON)
+                    - 응답 데이터 대체용(JSON)
+        - repository
+            - JPA를 이용하여 데이터베이스와 상호 작용
+            - 내부적으로 (*)SQL 담당
+            - 자동 구성해줌 -> 메소드 사용 (알아서 내부적으로 해줌), 단 복잡한 쿼리는 필요 시 직접 구성 가능함
+            - 엔티티 객체를 사용하여 CRUD 작업
+
+        - entity
+            - (*)데이터베이스의 테이블과 매핑이 되는 객체
+            - 엔티티는 곧 테이블이다
+            - 엔티티 객체 1개는 곧 데이터 1개이다 (1대 1로 매핑)
+            - ORM(객체 관계 매핑)을 실제로 구현한 것
+            - 보안에 취약
+            - 클라이언트에게 노출되면 안됨, 최대 Service까지만 사용 가능, controller 사용 x
+
+        - jpa
+            - Java Persistance API
+            - (*)자바 표준 ORM 기술
+            - 객체와 관계형 데이터베이스 간의 매칭 제공
+                - JPA 사용은 데이터베이스를 자바에서 객체 지향으로 관리하겠다 의도!!, SQL 사용을 최대한 배제
+
+        - database
+            - RDB
+
+# 구성 실습
+    - 1. 패키지 구성
+        - 방식 (대략 2가지 존재재)
+            - 비즈니스 로직 별로 구성
+                - auth
+                    - *Controller.java
+                    - *Service.java
+                    - ...
+                - main
+                    - *Controller.java
+                    - *Service.java
+                    - ...
+            - (*)자바 파일의 용도별로 구성성
+                - controllers
+                    - *Controller.java
+                - services
+                    - *Service.java
+                - dto
+                - repositories
+                - entities
