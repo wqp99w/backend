@@ -263,13 +263,14 @@
 
         - service
             - (*)비즈니스 로직 처리 계층
-            - ex) 검색, 로그인, 로그아웃, 회원가입, 글등록, 글수정, ...
+            - ex) 검색, 로그인, 로그아웃, 회원가입, 글등록, 글수정, ... -> SQL 수정
             - 필요 시 여러 API, 라이브러리 동원하여 처리
             - 요약
                 - 컨트롤러의 요청을 받아서 처리, 결과를 반환
                 - 데이터는 DTO대상으로 처리
 
         - dto (Data Transfer Object)
+            - 서비스내에서 다루는 데이터
             - (*)엔티티와 데이터 교환 역할
             - 왜?, 엔티티는 디비의 테이블에 1개의 데이터와 각각 연결되어 있음
                 - 엔티티가 수정되면, 디비상 테이블의 데이터도 수정된다!! (동기화되어 있음)
@@ -326,3 +327,56 @@
                 - dto
                 - repositories
                 - entities
+
+    - 2. ERD 구성
+        - ERD
+            - 데이터 모델링 분야의 표현방식
+            - 개체-관계 모델이라는 구조화 처리를 표현한 것
+            - 툴에 상관없이 프로젝트 결과물에는 반드시 포함!!
+        - 데이터베이스 모델링/ERD 테이블 정의 기본
+        - 목표 : 게시판
+            - 글작성, 댓글 작성하는 게시판
+            - draw.io라는 툴에서 작성
+            - 필요한 기능은 툴에서 설정
+        - 테이블 설계
+            - 개발하면서 계속 수정 가능!!
+            - 개발의 첫 작업!!
+
+    - 3. 엔티티 구성
+        - 현재 요구사항은 테이블 2개 -> 엔티티 2개 생성
+        - 테이블명과 동일하게 구성, 필요 시 변경 가능
+        - 자바 파일 생성
+            - ~/entities/Post.java, Review.java
+
+    - 4. 게시물 화면으로 보이기 (게시판 뷰)
+        - Post 테이블의 내용을 html으로 표시
+            - 4-1. 더미 데이터 삽입 후 테스트 -> h2 입력
+            - 4-2. 데이터를 html 뿌리는 과정을 통해 db 연동 플로우 체크
+                - 4-2-1. postContoller에서 /post/list, get 방식 준비
+                    - ~/template/test/post_list.html
+                    - (여기 하는 중)controller <-> service <-> dto <-> repository <-> entity <-> jpa <-> database
+                - 4-2-2. 서비스 구성
+                    - controller <-> (*)service <-> dto <-> repository <-> entity <-> jpa <-> database
+                - 4-2-3. dto 구성
+                    - controller <-> service <-> (*)dto <-> repository <-> entity <-> jpa <-> database
+                - 4-2-4. repository 구성
+                    - controller <-> service <-> dto <-> (*)repository <-> entity <-> jpa <-> database
+
+    - 5. 타임리프 문법 기본 문법
+        - 템플릿 제공 (편집 내용 확인)
+        - SSR 습득
+
+    - 6. 게시판 기능 완성 -> CRUD 연습습
+        - 글 목록
+            - 글 작성
+            - 글 수정
+            - 글 삭제
+            - 리뷰 작성
+                - 리뷰 목록 보기
+                - 리뷰 수정
+                - 리뷰 삭제
+
+            
+
+
+        
