@@ -71,4 +71,19 @@ public class HomeController {
         // 3-1. 클라이언트가 보낸 내용에서 데이터 추출
         return nid+" news "+id+" "+servicetype;
     }
+
+    @GetMapping("/dashboard")
+    public String dashboard() {
+        return "board/post_list";
+    }
+
+    /**
+     * 타임리프, 템플릿 분할 및 조립 연습용 페이지
+     *  - html을 분할하여 공통부분 조립하는 단위 테스트
+     * @return
+     */
+    @GetMapping("/test/layout")
+    public String layout() {
+        return "ui/index";
+    }
 }

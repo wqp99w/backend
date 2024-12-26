@@ -1,0 +1,50 @@
+<div th:fragment="frag_content" class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">게시판</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">게시판</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="my-3 border-bottom pb-1" th:text="${ 'Post 관리' }"></h5>
+                    <form method="post" >
+                        <div class="my-3">
+                            <label for="subject" class="form-label">제목</label>
+                            <input type="text" id="subject" class="form-control" placeholder="제목을 입력하세요">
+                        </div>
+                        <div class="my-3">
+                            <label for="content" class="form-label">본문</label>
+                            <textarea name="content" id="content" class="form-control" rows="7"></textarea>
+                        </div>
+                        <div class="my-3">
+                            <input type="submit" value="저장하기" class="btn btn-warning">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+
+
+
+
+
+
+

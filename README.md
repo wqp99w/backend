@@ -357,26 +357,118 @@
                     - (여기 하는 중)controller <-> service <-> dto <-> repository <-> entity <-> jpa <-> database
                 - 4-2-2. 서비스 구성
                     - controller <-> (*)service <-> dto <-> repository <-> entity <-> jpa <-> database
+
                 - 4-2-3. dto 구성
                     - controller <-> service <-> (*)dto <-> repository <-> entity <-> jpa <-> database
+
                 - 4-2-4. repository 구성
                     - controller <-> service <-> dto <-> (*)repository <-> entity <-> jpa <-> database
 
+                - 4-2-5. 타임리프 템플릿 엔진 적용
+                    - 화면에 게시물의 내용 출력 
+
     - 5. 타임리프 문법 기본 문법
         - 템플릿 제공 (편집 내용 확인)
+            - 개발 시작
+                - 기획 -> 기획서 작성, 스토리 보드, ERD 구성
+                - 개발팀 : 개발 -> 디자인 입히는 과정이 필요!! -> (*) 5-1 템플릿 제공, 위치시킴킴
+                    템플릿 제공
+                        - ~/resources/static
+                            dist
+                                ㄴss
+                                ㄴimg
+                                ㄴjs
+                            plugins
+                                ㄴ* : js라이브러리
+                        - ~/resources/templates
+                            board
+                                ㄴ*.html : 글목록/쓰기/수정/삭제, 리뷰..
+                            lib
+                                ㄴ*.html : 레이아웃 전용 (기본 템플릿)
+                - DBA : 모델링, 테이블등 작업
+                - 디자인 : 시안(a, b, c, d) -> html 코딩, css 작업 등등
+                - js : 프런트 진행
+                - 
+            - 5-2. 각 용도에 맞게 라우트 처리
+                - 실습
+                    - 아래 URL 모두 준비, 기본값 세팅, Get방식 정리
+                - HomeController
+                    - 대시보드 메인     : ~/dashboard
+                - PostController
+                    - 글 목록(게시판)   : ~/post/list
+                    - 글 작성하기       : ~/post/create
+                    - 글 상세보기       : ~/post/detail/{id}
+                    - 글 수정하기       : ~/post/modify/{id}
+                    - 글 삭제하기       : ~/post/delete/{id}
+                - ReviewController
+                    - 리뷰 쓰기         : ~/review/create
+                    - 리뷰 목록         : ~/review/list
+                    - 리뷰 수정하기     : ~/review/modify/{id}
+                    - 리뷰 삭제하기     : ~/review/delete/{id}
+
+        - 5-3. 템플릿 구성 이해
+            - 타임리프 문법 정리
+            - 레이아웃 적용법, 조각 대체법 확인
+            - html 구성 내용 이해
+
         - SSR 습득
 
-    - 6. 게시판 기능 완성 -> CRUD 연습습
-        - 글 목록
-            - 글 작성
-            - 글 수정
-            - 글 삭제
-            - 리뷰 작성
-                - 리뷰 목록 보기
-                - 리뷰 수정
-                - 리뷰 삭제
+    - 6. 게시판 기능 완성 -> CRUD 연습
+        - (*)글 목록                    : 기능 + 디자인 결합
+                - PostController
+                - board/post_list_content.html
+                - 더미데이터 입력
+                ```
+                    insert into post(subject, content, create_date)
+                    values ('제목3', 'ㅁㄴㅇ', now())
+                ```
+            - 글 작성               : 기능 + 디자인 결합 - insert, 입력폼 - 유효성검사(마지막 세팅), form, input
+                - 폼 전송 시도
+                ```
+                    There was an unexpected error (type=Method Not Allowed, status=405).
+                    Method 'POST' is not supported.
+                    org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'POST' is not supported
+                ```
+                - 입력 => 유효성 검사 추가 (백엔드 중심)
+                    - 목표 : 정확한 데이터를 입력받게끔 유도 -> 보안이슈, 운영이슈
+                    - 절차
+                        - 검사폼 클래스 구성 -> 컨트롤러(내부 특정 메소드) 적용 -> html 반영 
+                        - 검사폼 클래스 -> ~/form/PostForm 구성
+            - 글 수정               : 기능 + 디자인 결합 - update, 입력폼 - 유효성검사, form, input
+            - 글 삭제               : 기능 + 디자인 결합 - delete, 경고창(실수로 누를 수 있다) + JS동반 -> 삭제처리
+            - 글 상세보기
+                - (*)리뷰 목록 보기    : 기능 + 디자인 결합
+                    - 더미데이터
+                    ```
+                        insert into review
+                        (content, create_date, post_id)
+                        values
+                        ('댓글 6', now(), 3);
+                    ```
+                - 리뷰 작성         : 기능 + 디자인 결합 - insert, 입력폼 - 유효성검사, form, input
+                    - (*) 오후 학습 정리시간에 시도해보기
+                - 리뷰 수정         : 기능 + 디자인 결합 - update, 입력폼 - 유효성검사, form, input
+                - 리뷰 삭제         : 기능 + 디자인 결합 - delete, 경고창(실수로 누를 수 있다) + JS동반 -> 삭제처리
 
             
-
-
+    - 7. 목표
+        - 게시판 완성 (풀 버전은 아님)
+        - 스프링 시큐리티를 이용한 인증
+            - (*)세션
+        - 내일
+            - JWT or oAuth2
+            - AOP/로깅
+            - RestAPI + swagger(테스트트)
+            - maven + myBatis -> 프로젝트 구조
+            - 파일 업로드 (이미지, 기타 파일)
+            - 웹소켓 (챗봇)
+            - 깃헙 팀작업(프로젝트 첫날) 진행 예정
+            - 프로젝트 구조
+                - SSR only springboot <-> DB
+                - CSR react <-> springboot(restapi) <-> DB
+                - react(CSR) in SSR springboot <-> DB
+        - 프로젝트 첫날
+            - 사후 테스트
+            - 팀빌딩
+            - 깃헙 팀작업(프로젝트 첫날) 진행 예정정
         

@@ -1,0 +1,54 @@
+<div th:fragment="frag_content" class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">게시판</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">게시판</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="my-3 border-bottom pb-1" th:text="${ 'Post 글 작성 폼' }"></h5>
+                    <!--
+                        - action="URL" 폼 전송을 할 때, 데이터를 받아 줄 주소, URL 쪽으로 데이터가 전달, 생략되면 현재 URL로 전송
+                    -->
+                    <form method="post">
+                        <div class="my-3">
+                            <label for="subject" class="form-label">제목</label>
+                            <!-- name 속성은 데이터의 키값, 없으면 데이터가 누락됨!! -->
+                            <input type="text" name="subject" id="subject" class="form-control" placeholder="제목을 입력하세요">
+                        </div>
+                        <div class="my-3">
+                            <label for="content" class="form-label">본문</label>
+                            <textarea name="content" id="content" class="form-control" rows="7"></textarea>
+                        </div>
+                        <div class="my-3">
+                            <input type="submit" value="저장하기" class="btn btn-warning">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+
+
+
+
+
+
+

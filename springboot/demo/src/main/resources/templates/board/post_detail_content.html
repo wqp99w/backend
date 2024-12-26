@@ -1,0 +1,52 @@
+<div th:fragment="frag_content" class="content-wrapper">
+    <section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="container my-3">
+                        <div class="card my-3">
+                            <div class="card-header">
+                                <p>제목 <span class="badge bg-danger">리뷰 n개</span></p>
+                            </div>
+                            <div class="card-body">
+                                <div class="card-text" >내용</div>
+                                <div class="badge bg-light text-primary text-start">날짜</div>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-success btn-sm">수정</a>
+                        <a href="#" class="btn btn-danger btn-sm">삭제</a>
+
+                    </div>
+
+                    <!-- 리뷰 등록 -->
+                    <div class="container my-3">
+
+                        <p class="border-bottom py-2 my-3">리뷰 등록</p>
+                        <form action="#" method="post">
+                            <input type="text" name="content" id="content"/>
+                            <input type="submit" value="리뷰 등록"/>
+                        </form>
+                    </div>
+
+                    <!-- 리뷰 목록 노출 -->
+                    <div class="container my-3">
+                        <div class="card my-3 bg-warning">
+                            <div class="card-body">
+                                <div class="card-text">
+                                    내용-시간
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="#" class="btn btn-info btn-sm">수정</a>
+                                <a href="#" class="btn btn-danger btn-sm">삭제</a>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

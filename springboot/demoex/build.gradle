@@ -52,6 +52,12 @@ dependencies {
 	// implementation 'com.mysql:mysql-connector-j:9.1.0'
 
 	// build.gradle 변화 -> 설치 (우측 바에 코끼리 아이콘 클릭 -> Gradle 밑에 바에 새로고침 버튼 클릭 -> 사용
+
+	// 템플릿 나누기, html을 쪼개서 공통부분 분할, 조립하여 화면을 구성(지원)하는 라이브러리
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+	// 입력창 유효성 검사 및 폼 데이터 관리 모듈, 유효성 검사, 폼 검사 지원
+	// html 가능, JS 가능, (*)백엔드 가능
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {

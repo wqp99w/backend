@@ -1,0 +1,59 @@
+<div th:fragment="frag_content" class="content-wrapper">
+    <section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- 글 상세보기 뷰 -->
+                    <div class="container my-3">
+                        <div class="card my-3">
+                            <div class="card-header">
+                                <p th:text="${ post.getSubject() }"> <span class="badge bg-danger">리뷰 n개</span></p>
+                            </div>
+                            <div class="card-body">
+                                <div class="card-text" th:text="${ post.getContent() }">내용</div>
+                                <div class="badge bg-light text-primary text-start"
+                                     th:text="${ post.getCreateDate() }">날짜</div>
+                            </div>
+                        </div>
+                        <a th:href="|/post/modify/${post.getId()}|" class="btn btn-success btn-sm">수정</a>
+                        <a th:href="|/post/delete/${post.getId()}|" class="btn btn-danger btn-sm">삭제</a>
+
+                    </div>
+
+                    <!-- 리뷰 등록 -->
+                    <div class="container my-3">
+
+                        <p class="border-bottom py-2 my-3">리뷰 등록</p>
+                        <form th:action="|/review/create/${post.getId()}|" method="post">
+                            <input type="text" name="content" id="content"/>
+                            <input type="submit" value="리뷰 등록"/>
+                        </form>
+                    </div>
+
+                    <!-- 리뷰 목록 노출 -->
+                    <div class="container my-3">
+                        <!-- 리뷰 - 반복문 작성 -->
+                        <div class="card my-3 bg-warning" th:each="review : ${post.getReviews()}">
+                            <div class="card-body">
+                                <div class="card-text">
+                                    <!-- review는 엔티티이다 -> ReviewDto 만들어서 교환 필요 (차후)-->
+                                    [[  |
+                                        ${review.getContent()} ${review.getCreateDate()}
+                                    |   ]]
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <!-- 실습 : 리뷰 수정, 삭제 링크 세팅 -->
+                                <a th:href="|review/modify/${review.getId()}|" class="btn btn-info btn-sm">수정</a>
+                                <a th:href="|review/delete/${review.getId()}|" class="btn btn-danger btn-sm">삭제</a>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
