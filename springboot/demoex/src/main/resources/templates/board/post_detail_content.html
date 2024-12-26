@@ -25,10 +25,25 @@
                     <div class="container my-3">
 
                         <p class="border-bottom py-2 my-3">리뷰 등록</p>
-                        <form th:action="|/review/create/${post.getId()}|" method="post">
-                            <input type="text" name="content" id="content"/>
+                        <!-- /* 리뷰등록 url 적용 */-->
+                        <form th:action="@{|/review/create/${post.getId()}|}" method="post" id="reviewForm">
+                            <!--
+                                - 프런트에서 유효성 점검
+                                - html5에서 추가된 입력 속성 중 필수 입력 옵션 적용, 빈값 체크
+                                    - required: 필수 입력, 비워 있다면 체킹됨
+                                 - JS
+                                    - 길이체크, 빈값 체크, 타입체크 등등 프런트에서 해결 가능함
+                                    - 장점 : 서버측으로 요청 X -> 서버 부하를 줄일 수 있다!!
+                                    - 순수 JS or jQuery 같은 라이브러리 사용
+                                    - </body> 닫히기 직전, 혹은 해당 코드 바로 밑에서 사용 가능
+                            -->
+<!--                            <input type="text" name="content" id="content" required/>-->
+                            <input type="text" name="content" id="content" />
                             <input type="submit" value="리뷰 등록"/>
                         </form>
+                        <script>
+
+                        </script>
                     </div>
 
                     <!-- 리뷰 목록 노출 -->

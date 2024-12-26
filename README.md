@@ -252,7 +252,7 @@
     - 코드 관점
         - workflow
             - controller <-> service <-> dto <-> repository <-> entity <-> jpa <-> database
-            - 일부 가감될 수는 있다
+            - 일부 가감될 수는 있다 
 
         - controller
             - 클라이언트 요청을 처리하는 진입점, 클라이언트는 여기까지만 올 수 있음
@@ -434,7 +434,29 @@
                     - 절차
                         - 검사폼 클래스 구성 -> 컨트롤러(내부 특정 메소드) 적용 -> html 반영 
                         - 검사폼 클래스 -> ~/form/PostForm 구성
+                        - 컨트롤러
+                            - 입력폼이 보이는 화면 (GET)
+                                - 검증 결과 후 에러나면 표기하기 위해
+                                - ~/create => ~/create2
+                            - 입력폼에서 전달한 데이터를 표기 하기 위해 (POST)
+                                - 검사폼 클래스 적용
+                                    - 검증 용도
+                                - ~/create -> ~/create2
+                        - html 반영
+                            - post_form_content.html  
+                                - form 클래스
+
             - 글 수정               : 기능 + 디자인 결합 - update, 입력폼 - 유효성검사, form, input
+                - 컨트롤러에서 요청 시 -> 해당 id에 일치하는 Post 데이터 획득 -> dto등에 담아서
+                - PostForm 객체에 세팅하여 -> post_form_content.html <form>에 반영
+                - 입력과 수정은 화면이 거의 동일함(같이 사용, 여기선)
+                - workflow
+                    - 컨트롤러 구성 (Get)
+                        - 수정 화면
+                    - 컨트롤러 구성 (post)
+                        - 수정 하기
+                        - 글 등록과 거의 동일 (최종 처리(디비 처리)만 다름)
+
             - 글 삭제               : 기능 + 디자인 결합 - delete, 경고창(실수로 누를 수 있다) + JS동반 -> 삭제처리
             - 글 상세보기
                 - (*)리뷰 목록 보기    : 기능 + 디자인 결합
