@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +32,27 @@ public class ReviewService {
     public ReviewDto getOneReview(int id) {
         // id -> Review 엔티티
         // 데이터가 존재할 때 처리 -> 엔티티 -> ReviewDto 반환
-
+        Optional<Review> oReview = reviewRepository.findById(id);
+        if(oReview.isPresent()) {
+            Review review = oReview.get();
+            return ReviewDto.builder()
+                    .id(review.getId())
+                    .content(review.getContent())
+                    .createDate(review.getCreateDate())
+                    .post(review.getPost())
+                    .build();
+        }
         // 없을 경우 -> 예외처리를 던지는 것으로 정리
         // throw new Exception();
         return  null;
+    }
+
+    public void delete(ReviewDto reviewDto) {
+        this.reviewRepository.delete(reviewDto.toEntity());
+    }
+
+    // 리뷰 수정
+    public void modify(ReviewDto reviewDto) {
+        this.reviewRepository.save(reviewDto.toEntity());
     }
 }

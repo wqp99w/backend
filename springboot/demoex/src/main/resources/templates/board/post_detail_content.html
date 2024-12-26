@@ -60,8 +60,8 @@
                             </div>
                             <div class="card-footer">
                                 <!-- 실습 : 리뷰 수정, 삭제 링크 세팅 -->
-                                <a th:href="|review/modify/${review.getId()}|" class="btn btn-info btn-sm">수정</a>
-                                <a th:href="|review/delete/${review.getId()}|" class="btn btn-danger btn-sm">삭제</a>
+                                <a th:href="@{|/review/modify/${review.getId()}|}" class="btn btn-info btn-sm">수정</a>
+                                <a th:href="@{|/review/delete/${review.getId()}|}" class="btn btn-danger btn-sm">삭제</a>
                             </div>
 
                         </div>

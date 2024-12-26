@@ -3,11 +3,14 @@ package com.example.demoex.controllers;
 import com.example.demoex.dto.PostDto;
 import com.example.demoex.dto.ReviewDto;
 import com.example.demoex.entities.Review;
+import com.example.demoex.form.ReviewForm;
 import com.example.demoex.services.PostService;
 import com.example.demoex.services.ReviewService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -49,22 +52,49 @@ public class ReviewController {
 
     }
 
-    // 리뷰 수정
+    // 리뷰 수정, 검증 폼을 활용, 화면 세팅 (기존 내용 채워서) 구성
     @GetMapping("/modify/{id}")
-    public String modify(@PathVariable int id) {
-        return "board/review_form";
+    public String modify(ReviewForm reviewForm, @PathVariable int id) {
 
+        // 리뷰폼에 내용 세팅 -> 수정 시 관련 내용 자동 세팅
+        // 리뷰 id -> 리뷰 획득 -> 리뷰폼 세팅
+        ReviewDto reviewDto = this.reviewService.getOneReview(id);
+        reviewForm.setContent(reviewDto.getContent());
+        return "board/review_form";
+    }
+    // 리뷰 수정 처리
+    @PostMapping("/modify/{id}")
+    public String modify(@Valid ReviewForm reviewForm,
+                         BindingResult bindingResult,
+                         @PathVariable int id){
+        // 1. 유효성 검증 결과 에러가 존재하면 -> 오류 세팅하여 입력폼 화면 띄우기
+        if (bindingResult.hasErrors()) {
+            return "board/review_form"; // 같은 url의 get 방식의 리턴값
+        }
+
+        // 2. id에 해당되는 ReviewDto 획득
+        ReviewDto reviewDto = this.reviewService.getOneReview(id);
+
+        // 3. 새로 입력한 내용으로 ReviewDto 수정
+        reviewDto.setContent(reviewForm.getContent());
+
+        // 4. 서비스에 수정 요청, ReviewDto 전달
+        this.reviewService.modify(reviewDto);
+
+        // 5. 본글 상세 보기로 포워딩 -> 수정된 리뷰 확인 가능 (본글 상세보기에서 확인)
+        return "redirect:/post/detail/" + reviewDto.getPost().getId();
     }
 
     // 리뷰 삭제
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable int id) {
         // 1. 리뷰 ID를 기반 -> 실제로 데이터가 존재하는지 조회
-        Review review = this.reviewService.getOneReview(id);
+        ReviewDto reviewDto = this.reviewService.getOneReview(id);
         // 2. 없을 경우 처리 -> 생략
         // 3. 테이블상에서 실제 삭제 -> 서비스.delete(reviewDto)
-
-        return "redirect:/post/detail/" + id;
+        this.reviewService.delete(reviewDto);
+        // 4. 본글 상세보기 -> 특정 리뷰의 삭제 버튼 클릭 -> 삭제 요청/처리 -> 본글 상세보기
+        return "redirect:/post/detail/" + reviewDto.getPost().getId();
 
     }
 }
