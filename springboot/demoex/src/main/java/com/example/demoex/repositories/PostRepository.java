@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  *  - 패턴에 따라 생성 가능
  *  - 직접 SQL 사용 가능
  */
-public interface PostRepository extends JpaRepository<Post, Integer> { // Post는 사용할 엔티티, Integer는 기본키 타입
-
+public interface PostRepository
+        extends JpaRepository<Post, Integer> { // Post는 사용할 엔티티, Integer는 기본키 타입
 }
