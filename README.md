@@ -524,3 +524,16 @@
         - 인증이 있어야만 접근 가능한 페이지
         - 인증 없이 접근할 수 있는 페이지
         - 권한(인가)에 따라 메뉴가 상이하게 노출
+
+- 세팅
+    - 외부 라이브러리
+    ```
+        // 스프링 시큐리티 프레임워크
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        
+        // 타임리프와 연동하는 스프링 시큐리티
+        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+        // 단위 테스트 스프링시큐리티
+        testImplementation 'org.springframework.security:spring-security-test'
+    ```
