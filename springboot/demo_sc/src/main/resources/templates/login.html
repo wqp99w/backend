@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+</head>
+<body>
+    <fieldset></fieldset>
+    <fieldset>
+        <form action="/login" method="post">
+            <!-- 스프링 시큐리티에서 사용한 이름이 username, 실 데이터는 email -->
+            <input type="text" name="username" id="username" placeholder="Email"/>
+            <br/>
+            <input type="password" name="password" id="password" placeholder="Password"/>
+            <br/>
+            <input type="submit" value="로그인"/>
+        </form>
+    </fieldset>
+    <fieldset>
+        <a href="/signup">회원가입 이등</a>
+    </fieldset>
+    <fieldset>
+        <!-- 로그아웃 등장 -->
+        <div sec:authorize="isAuthenticated()">
+            <!-- 인증된 사용자만 볼 수 있는 콘텐츠 -->
+            Welcome <span sec:authentication="name"></span>
+            <a href="/logout">로그아웃</a>
+        </div>
+        <div sec:authorize="isAnonymous()">
+            <!-- 인증되지 않은 유저에게 노출된다 -->
+            <a href="/login">로그인</a>
+        </div>
+    </fieldset>
+</body>
+</html>

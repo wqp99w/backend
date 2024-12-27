@@ -504,36 +504,76 @@
             - 깃헙 팀작업(프로젝트 첫날) 진행 예정정
 
 # 스프링 시큐리티
-- 개요
-    - 스프링 프레임워크의 하위 프레임워크
-    - 용도 : 인증, 인가(권한), 보안 프레임워크, 필수 적용
-    - 버전 : 6.x 사용
+    - 개요
+        - 스프링 프레임워크의 하위 프레임워크
+        - 용도 : 인증, 인가(권한), 보안 프레임워크, 필수 적용
+        - 버전 : 6.x 사용
 
-- 특징
-    - 인증
-    - 인가
-    - 보안정책설정
-    - 세션관리
-    - JWT, oAuth2 지원
-    - CSRF 공격 방어어
+    - 특징
+        - 인증
+        - 인가
+        - 보안정책설정
+        - 세션관리
+        - JWT, oAuth2 지원
+        - CSRF 공격 방어어
 
-- 목적
-    - 로그인, 로그아웃
-    - 회원가입, 회원수정 x
-    - 페이지별 접근 여부 등 정책 적용
-        - 인증이 있어야만 접근 가능한 페이지
-        - 인증 없이 접근할 수 있는 페이지
-        - 권한(인가)에 따라 메뉴가 상이하게 노출
+    - 목적
+        - 로그인, 로그아웃
+        - 회원가입, 회원수정 x
+        - 페이지별 접근 여부 등 정책 적용
+            - 인증이 있어야만 접근 가능한 페이지
+            - 인증 없이 접근할 수 있는 페이지
+            - 권한(인가)에 따라 메뉴가 상이하게 노출
 
-- 세팅
-    - 외부 라이브러리
-    ```
-        // 스프링 시큐리티 프레임워크
-        implementation 'org.springframework.boot:spring-boot-starter-security'
-        
-        // 타임리프와 연동하는 스프링 시큐리티
-        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    - 세팅
+        - 외부 라이브러리
+        ```
+            // 스프링 시큐리티 프레임워크
+            implementation 'org.springframework.boot:spring-boot-starter-security'
+            
+            // 타임리프와 연동하는 스프링 시큐리티
+            implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
-        // 단위 테스트 스프링시큐리티
-        testImplementation 'org.springframework.security:spring-security-test'
-    ```
+            // 단위 테스트 스프링시큐리티
+            testImplementation 'org.springframework.security:spring-security-test'
+        ```
+
+    - 구조
+        - 설정 (config)
+            - 시큐리티 전반적인 정책 기술
+        - 컨트롤러
+            - 홈페이지 (인증 후 접근 가능하게 설계)
+            - 회원 관리 페이지 (로그인, 로그아웃, 회원가입, ...)
+        - 엔티티
+            - User 테이블
+        - Dto
+            - User 관련 통신/디비용(가능하면 겸용)
+        - 레포지토리
+            - 회원관련 SQL 처리
+        - 서비스
+            - user 서비스 (DB용)
+            - UserDetail 서비스 (인증 정보 등 용도)
+        - 유틸
+            - 컴포넌트 등록 -> DI 처리
+            - 인증/권한 정보 메소드 제공
+    
+    - 구성
+        - 패키지 구성
+        - 패키지 내 세부 파일(자바) 구성
+        - 엔티티 상세 작업
+        - application.properties -> yml 파일로 변경 처리(계층 표현)
+        - 상세 구현
+
+#소스기반 별 기술 확인
+    - backend_1
+        - restapi + swagger + JS : 차트 그리기
+        - 웹소켓을 이용한 실시간 채팅 (네이버 뉴스 검색) : 채팅방식
+    - aop_test
+        - aop
+        - 로그/로깅
+        - 관리 및 유지보수, 편의성
+    - test_mybatis
+        - maven 빌드 (pom.xml)
+        - 디비연동 mybatis
+    -  upload_test
+        - 파일 업로드 (ajax, html, form)

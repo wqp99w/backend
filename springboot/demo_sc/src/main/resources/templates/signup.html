@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+</head>
+<body>
+    <fieldset>
+        <form th:action="@{/signup_process}" method="post">
+            <input type="text" name="email" id="email" placeholder="Email"/>
+            <br/>
+            <input type="password" name="password" id="password" placeholder="Password"/>
+            <br/>
+            <input type="submit" value="회원가입"/>
+        </form>
+    </fieldset>
+</body>
+</html>

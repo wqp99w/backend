@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>홈</title>
+</head>
+<body>
+    홈
+    <!-- 로그아웃 등장 -->
+    <div sec:authorize="isAuthenticated()">
+        <!-- 인증된 사용자만 볼 수 있는 콘텐츠 -->
+        Welcome <span sec:authentication="name"></span>
+        <a href="/logout">로그아웃</a>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <!-- 인증되지 않은 유저에게 노출된다 -->
+        <a href="/login">로그인</a>
+    </div>
+    <!-- 특정 Role이 있다면 -->
+    <div sec:authorize="hasRole('ROLE_ADMIN')">
+        <!-- 관리자만 노출되는 화면 -->
+        <!-- 현재는 Role 부여 x, 노출 안됨 -->
+        Admin panel
+    </div>
+</body>
+</html>
