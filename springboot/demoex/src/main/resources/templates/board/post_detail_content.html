@@ -26,7 +26,7 @@
 
                         <p class="border-bottom py-2 my-3">리뷰 등록</p>
                         <!-- /* 리뷰등록 url 적용 */-->
-                        <form th:action="@{|/review/create/${post.getId()}|}" method="post" id="reviewForm">
+                        <form th:action="@{|/review/create/${post.getId()}|}" method="post" th:object="${reviewForm}">
                             <!--
                                 - 프런트에서 유효성 점검
                                 - html5에서 추가된 입력 속성 중 필수 입력 옵션 적용, 빈값 체크
@@ -38,7 +38,11 @@
                                     - </body> 닫히기 직전, 혹은 해당 코드 바로 밑에서 사용 가능
                             -->
 <!--                            <input type="text" name="content" id="content" required/>-->
-                            <input type="text" name="content" id="content" />
+                            <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+                                <!-- for each 방식, 에러를 하나씩 꺼내서 반복적으로 출력 -->
+                                <div th:each="error : ${#fields.allErrors()}" th:text="${error}"></div>
+                            </div>
+                            <input type="text" th:field="*{content}" id="content" />
                             <input type="submit" value="리뷰 등록"/>
                         </form>
                         <script>
@@ -63,10 +67,9 @@
                                 <a th:href="@{|/review/modify/${review.getId()}|}" class="btn btn-info btn-sm">수정</a>
                                 <a th:href="@{|/review/delete/${review.getId()}|}" class="btn btn-danger btn-sm">삭제</a>
                             </div>
-
                         </div>
-
                     </div>
+
                 </div>
             </div>
         </div>

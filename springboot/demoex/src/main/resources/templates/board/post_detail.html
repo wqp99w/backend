@@ -6,23 +6,23 @@
   <div th:replace="lib/left_sidebar.html :: frag_left_sidebar"></div>
   <div th:replace="board/post_detail_content.html :: frag_content"></div>
   <div th:replace="lib/footer.html :: frag_footer"></div>
-  <script>
-    // 리뷰 작성 시 입력폼에 대한 검사 수행
-    // const reviewForm = ${'#reviewForm'};
-    // console.log("리뷰폼", reviewForm);
-    $('#reviewForm').on('submit', (e) => {
-      // 1. submit 이벤트 무효화
-      // e.preventDefault();
-      // 2. 값 체크
-      const reviewValue = $('#content').val(); // trim() 공백제거
-      console.log("입력값", reviewValue, reviewValue.length);
-      if (reviewValue === '' || reviewValue.length > 256) { // 빈값
-        alert('Please enter a valid review');
-        return false;
-      }
-      return true;
-    });
-  </script>
+<!--  <script>-->
+<!--    // 리뷰 작성 시 입력폼에 대한 검사 수행-->
+<!--    // const reviewForm = ${'#reviewForm'};-->
+<!--    // console.log("리뷰폼", reviewForm);-->
+<!--    $('#reviewForm').on('submit', (e) => {-->
+<!--      // 1. submit 이벤트 무효화-->
+<!--      // e.preventDefault();-->
+<!--      // 2. 값 체크-->
+<!--      const reviewValue = $('#content').val(); // trim() 공백제거-->
+<!--      console.log("입력값", reviewValue, reviewValue.length);-->
+<!--      if (reviewValue === '' || reviewValue.length > 256) { // 빈값-->
+<!--        alert('Please enter a valid review');-->
+<!--        return false;-->
+<!--      }-->
+<!--      return true;-->
+<!--    });-->
+<!--  </script>-->
 </div>
 
 </html>

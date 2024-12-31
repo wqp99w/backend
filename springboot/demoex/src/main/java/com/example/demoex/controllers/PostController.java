@@ -2,6 +2,7 @@ package com.example.demoex.controllers;
 import com.example.demoex.dto.PostDto;
 import com.example.demoex.entities.Post;
 import com.example.demoex.form.PostForm;
+import com.example.demoex.form.ReviewForm;
 import com.example.demoex.services.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +114,7 @@ public class PostController {
      * id 번호에 따라 글을 조회(디비 연동)하여, 상세보기 처리
      */
     @GetMapping("/detail/{id}")
-    public String detail(Model model, @PathVariable Integer id) {
+    public String detail(Model model, @PathVariable Integer id, ReviewForm reviewForm) {
         // 1. 파라미터 추출 => id 값 추출
         // 2. id를 이용하여 PostDto(Post와 교환된) 1개를 추출
         // 3. PostDto를 Model에 적용하여 타임리트에서 랜더링 요청

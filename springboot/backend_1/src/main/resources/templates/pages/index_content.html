@@ -76,6 +76,7 @@
 						<div class="card-body">
 							<div class="chart">
 								<div class="chartjs-size-monitor">
+									<!-- 바 차트 그려지는 공간 -->
 									<div class="chartjs-size-monitor-expand">
 										<div class=""></div>
 									</div>
@@ -108,6 +109,7 @@
 						</div>
 						<!-- /.card-header -->
 						<div class="card-body">
+							<!-- 데이터 표-->
 							<div id="jsGrid1"></div>
 						</div>
 						<!-- /.card-body -->
@@ -120,6 +122,7 @@
 
 	<script>
 		// 바로 위에 차트 자리에 있는 요소를 엑세스하여 차트및 테이블을 완성
+		// ajax 통신 -> /api/sales 통신(테이블 집계 -> json 응답)
 		// TODO #PORC1 1. 통신
 		axios.get('/api/sales')
 			.then(res => { // 정상응답
@@ -156,6 +159,7 @@
 				"amount": 45483092
 			}
 			*/
+			// 카테고리 정보만 배열로 추출
 			const categories = data.map(sale => sale.category)
 			console.log(categories); // [ 'Food', 'drink', '..', ..  ]
 			// 2-1-2. 평균 판매가 추출
@@ -167,15 +171,19 @@
 			// 2-2. 차트에 데이터 주입
 			// prices를 % 단위로 로 표현 (단위는 생략)
 			//        식 = 개별값(prices) / 전체합산값(?) * 100 => %단위로 환산됨 => 이렇게 표현되도록 prices 처리하시오
+			// 가격 누적 계산 -> 파이차트 -> 비율계산용
 			let prices_all_sum = prices.reduce((pv, cv) => pv + cv);
 			// https://www.w3schools.com/js/js_math.asp 참고
-			// 리뷰시간에 소수점 2째자리까지 표현 처리!!, round;반올림처리, 
+
+			// 리뷰시간에 소수점 2째자리까지 표현 처리!!, round;반올림처리,
+			// 개별 카테고리 가격/전체가격 => 비율 게산
 			let per_prices = prices.map(price => Math.round(price / prices_all_sum * 100, 2));
 
+			// 파이차트 그리기
 			initDChart(categories, per_prices, colors);  // 비율로 표현
 			//initDChart( categories, prices, colors );// 원값으로 표현
 
-			// 바차트 호출
+			// 바차트 그리기
 			let amounts = data.map(sale => sale.amount) // 카테고리별 판매량 추출 => 배열반환
 			initBarChart(categories, prices, amounts);
 		}

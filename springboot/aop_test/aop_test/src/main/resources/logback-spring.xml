@@ -3,6 +3,8 @@
     	 콘솔에 출력하는 패턴 세팅
     	 구분자는 공백 1칸으로 적용
     	 년-월-일 시:분:초 쓰레드 레벨 소속클레스 - 메세지
+    	 실제 서비스 구성 시 콘솔 출력 배제 -> 부하걸림 (회사별로 상이)
+    	 관리자 -> 로그파일 분석 -> 문제를 해결
      -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 기본 문자열 hello world  출력하는 홈페이지 준비 
  */
-// 롬복의 로그 처리
+// 롬복의 로그 처리 -> log.xxx() 이후로는 Sysout은 서버 부하걸리니까 사용 x
 @Slf4j
 @Controller
 public class HomeController {
@@ -35,17 +35,20 @@ public class HomeController {
 			// 0. 요청 객체 파라미터
 			HttpServletRequest request,
 			// 1. 별도의 헤더정보를 선정해서 파라미터로 추출 가능하다 !!
+			//		인증키, 시크릿키 등 별도의 중요 정보들도 헤더를 직접 추출 가능!!
 			@RequestHeader(value="User-Agent") String userAgent) {
 
 		// 2. userAgent
-		//    상세적인 브라우저, os, 모바일/PC등 정보등은 내용 해석해서 파악
+		//    상세적인 브라우저, os, 모바일/PC등 정보등은 내용 해석해서 파악 -> 접속 매체 분석 가능하다
 		log.info("User-Agent " + userAgent);
 		log.info("User-Agent " + request.getHeader("User-Agent") );
 
 		// 2. IP 정보 추출 -> 실시간 모니터링 -> 단시간에 특정 IP로 많은 요청이 온다면 -> DDOS 정황으로 본다
 		String ipAddress = request.getRemoteAddr();
+		// IP 트래킹 가능 (자기 자신은 0.0.0.0 ...)
 
-		// proxy(엘리트급은 체크않됨)를 통해서 우회해서 진입 -> 나를 특정하지 못하게 접근하기 위해 우회하는 경우
+		// proxy -> IP를 우회하여 접근할 때 사용 (1회성, 여러번 거쳐서 접속 가능..)
+		// proxy(엘리트급(최상)은 체크안됨)를 통해서 우회해서 진입 -> 나를 특정하지 못하게 접근하기 위해 우회하는 경우
 		String forwardedFor = request.getHeader("X-Forwarded-For");
 		if( forwardedFor != null) {
 			// 아래 코드 전까지 ipAddress == 우회n
@@ -70,6 +73,7 @@ public class HomeController {
 		// 서비스를 이용하여 특정 비즈니스 로직을 수행한다 -> aop가 감지해서 로깅처리하겠다
 		
 		// 특정 비즈니스 로직
+		// targetService.runTask 이 메소드 (가정, 특정 비즈니스 로직에 aop 이용)
 		targetService.runTask(); // 타겟이 작동할려고 한다 => aop 작동 => 로그출력(=>수집업그레이드)
 		
 		return "Helloworld";

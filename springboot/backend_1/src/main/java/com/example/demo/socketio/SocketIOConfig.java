@@ -18,11 +18,13 @@ import com.corundumstudio.socketio.SocketIOServer;
 @org.springframework.context.annotation.Configuration
 public class SocketIOConfig {
 	// application.properties에서 정보를 획득하여 맴버 변수의 초기값으로 세팅
+	// 환경변수 사용하고 싶으면 @Value 사용 -> 아래 변수에 할당해줌
 	@Value("${socketio.server.hostname}")
 	private String hostname;
 	@Value("${socketio.server.port}")
 	private int port;
-	
+
+	// 서버측에서 웹소켓 사용할 수 있게 빈 등록
 	@Bean
 	public SocketIOServer socketIOServer() {
 		Configuration config = new Configuration();

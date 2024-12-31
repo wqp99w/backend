@@ -45,6 +45,7 @@ public class FileUploadController {
         try {
             // 파일 저장
             Path filePath = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
+            // 파일 기록 -> 향후는 클라우드의 저장소 사용 권장 (aws s3), 여기서는 로컬 저장 처리
             Files.write(filePath, file.getBytes());
 
             return ResponseEntity.status(HttpStatus.OK)

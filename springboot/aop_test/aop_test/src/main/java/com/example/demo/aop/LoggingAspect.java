@@ -13,7 +13,8 @@ import com.example.demo.TestAopApplication;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @Aspect 적용
+ *
+ * @Aspect 적용 -> 기존 코드를 그대로 둔다. AOP 전용 클래스 구성 -> 대상을 관찰하게 등록
  * AOP 서비스가 내부적으로 프록시하여 자동관리
  * - 관심사 => 로그(깅)
  * @Component 

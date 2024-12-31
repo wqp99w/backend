@@ -3,7 +3,7 @@ spring:
     name: test_mybatis
   # DB 연동 정보
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/board
+    url: jdbc:mysql://127.0.0.1:3307/board
     username: root
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver

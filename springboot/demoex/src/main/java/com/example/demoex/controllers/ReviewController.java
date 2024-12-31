@@ -28,7 +28,11 @@ public class ReviewController {
     // Post 방식, 검증폼 사용 x
     @PostMapping("/create/{id}")
     public String create(@PathVariable int id,
-                         @RequestParam String content) {
+                         @Valid ReviewForm reviewForm,
+                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "redirect:/post/detail/" + id;
+        }
         // id : 본글 고유 번호 (PK)
         // content : 리뷰/댓글 내용
         // 1. id를 기반으로 post dto 획득
@@ -36,7 +40,7 @@ public class ReviewController {
 
         // 2. post dto, 리뷰 내용을 가지고, 서비스(ReviewService)로 이동, 리뷰 등록 처리
         this.reviewService.create(ReviewDto.builder()
-                        .content(content)
+                        .content(reviewForm.getContent())
                         .createDate(LocalDateTime.now())
                         .post(postDto.toEntity())
                         .build());
