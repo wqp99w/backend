@@ -75,7 +75,9 @@ public class AppSecurityConfig {
 
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 // 인증 관련하여 디비에 쿼리를 수행하여 존재여부 체크
+                // 서비스를 이용해서 내가 입력한 이메일을 통해 유저 정보를 가져온다
                 .userDetailsService(this.userDetailService)
+                // 입력한 비밀번호를 암호화해서, 유저 엔티티에 저장된 암호와 동일한지 검증한다.
                 .passwordEncoder(bCryptPasswordEncoder)
                 .and()
                 .build();
@@ -84,6 +86,8 @@ public class AppSecurityConfig {
     // 4. 암호화 관련 모듈 필요 -> 빈 구성 -> DI 처리 가능해짐
     //      사용자 -> 비번입력 1234 -> 암호화 -> 해시로 구성 29412iohafskjfsal
     @Bean
+    // 한 유저 엔티티의 비밀번호는 동일한 해시 함수로 암호화를 해야 하기 때문에
+    // 동일한 해시 함수를 사용하기 위해 아래의 함수를 사용하여 동일한 해시함수 입력
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }

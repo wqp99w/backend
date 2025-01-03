@@ -21,7 +21,7 @@ public class UserService {
     public void create(UserDto userDto) {
         userRepository.save(User.builder()
                         .email(userDto.getEmail())
-                        // 비번 안호화!! -> DI
+                        // 비번 암호화!! -> DI
                         .password(bCryptPasswordEncoder.encode(userDto.getPassword()))
                         .build());
     }

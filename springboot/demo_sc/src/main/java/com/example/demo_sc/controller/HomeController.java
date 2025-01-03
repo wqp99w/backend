@@ -20,6 +20,7 @@ public class HomeController {
 
     @GetMapping("/")
     // UserDetails 객체에 @AuthenticationPrincipal 적용하여 현재 인증 정보 삽입
+    // Principal은 스프링 시큐리티에서 인증된 사용자임, @AuthenticationPrincipal이거 사용하면 해당 객체에 principal 정보가 저장됨
     public String home(@AuthenticationPrincipal UserDetails userDetails, Principal principal) {
         // 1. 컨트롤러 내부(혹은 매개변수 추가하여)에서 인증 정보 체크, 접근 확인
         if(userDetails != null) System.out.println(userDetails.getUsername());
